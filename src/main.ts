@@ -3,6 +3,7 @@ import App from './App.vue'
 import router from './router';
 
 import { IonicVue } from '@ionic/vue';
+import { StatusBar, Style } from '@capacitor/status-bar';
 
 /* Core CSS required for Ionic components to work properly */
 import '@ionic/vue/css/core.css';
@@ -38,6 +39,15 @@ const app = createApp(App)
   .use(IonicVue)
   .use(router);
 
-router.isReady().then(() => {
+router.isReady().then(async () => {
   app.mount('#app');
+
+  try {
+    // Evita que el contenido invada la barra de estado
+    await StatusBar.setOverlaysWebView({ overlay: false });
+    // Ajusta el estilo de los iconos según el tema
+    await StatusBar.setStyle({ style: Style.Dark });
+  } catch {
+    // Ignorar en web/entornos no compatibles
+  }
 });
