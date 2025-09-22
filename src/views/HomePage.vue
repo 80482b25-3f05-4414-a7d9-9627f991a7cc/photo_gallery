@@ -1,56 +1,70 @@
 <template>
   <ion-page>
-    <ion-header :translucent="false">
+    <ion-header>
       <ion-toolbar>
-        <ion-title>Blank</ion-title>
+        <ion-title>Galería de Fotos (UCompensar)</ion-title>
       </ion-toolbar>
     </ion-header>
-
-    <ion-content :fullscreen="false">
-      <ion-header collapse="condense">
-        <ion-toolbar>
-          <ion-title size="large">Blank</ion-title>
-        </ion-toolbar>
-      </ion-header>
-
-      <div id="container">
-        <strong>Ready to create an app?</strong>
-        <p>Start with Ionic <a target="_blank" rel="noopener noreferrer" href="https://ionicframework.com/docs/components">UI Components</a></p>
-      </div>
+    <ion-content>
+      <ion-grid>
+        <ion-row>
+          <ion-col size="6" v-for="photo in photos" :key="photo.filepath">
+            <ion-img :src="photo.webviewPath" @click="showActionSheet(photo)"></ion-img>
+          </ion-col>
+        </ion-row>
+      </ion-grid>
+      <ion-fab vertical="bottom" horizontal="center" slot="fixed">
+        <ion-fab-button @click="takePhoto()">
+          <ion-icon :icon="camera"></ion-icon>
+        </ion-fab-button>
+      </ion-fab>
     </ion-content>
   </ion-page>
 </template>
 
 <script setup lang="ts">
-import { IonContent, IonHeader, IonPage, IonTitle, IonToolbar } from '@ionic/vue';
+  import { usePhotoGallery } from '@/composables/usePhotoGallery';
+  import { UserPhoto } from '@/composables/usePhotoGallery';
+  import { actionSheetController } from '@ionic/vue';
+  import { IonCol } from '@ionic/vue';
+  import { IonContent } from '@ionic/vue';
+  import { IonFab } from '@ionic/vue';
+  import { IonFabButton } from '@ionic/vue';
+  import { IonGrid } from '@ionic/vue';
+  import { IonHeader } from '@ionic/vue';
+  import { IonIcon } from '@ionic/vue';
+  import { IonImg } from '@ionic/vue';
+  import { IonPage } from '@ionic/vue';
+  import { IonRow } from '@ionic/vue';
+  import { IonTitle } from '@ionic/vue';
+  import { IonToolbar } from '@ionic/vue';
+  import { camera } from 'ionicons/icons';
+  import { close } from 'ionicons/icons';
+  import { trash } from 'ionicons/icons';
+
+  const { photos, takePhoto, deletePhoto } = usePhotoGallery();
+
+  const showActionSheet = async (photo: UserPhoto) =>
+  {
+    const actionSheet = await actionSheetController.create({
+      header: 'Fotos',
+      buttons: [
+        {
+          icon: trash,
+          role: 'destructive',
+          text: 'Eliminar',
+          handler: () => {
+            deletePhoto(photo);
+          },
+        },
+        {
+          icon: close,
+          role: 'cancel',
+          text: 'Cancelar',
+          handler: () => { },
+        },
+      ],
+    });
+    await actionSheet.present();
+  };
 </script>
-
-<style scoped>
-#container {
-  text-align: center;
-  
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-}
-
-#container strong {
-  font-size: 20px;
-  line-height: 26px;
-}
-
-#container p {
-  font-size: 16px;
-  line-height: 22px;
-  
-  color: #8c8c8c;
-  
-  margin: 0;
-}
-
-#container a {
-  text-decoration: none;
-}
-</style>
